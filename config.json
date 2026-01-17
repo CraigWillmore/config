@@ -1,0 +1,200 @@
+{
+  "log": {},
+  "inbounds": [
+      {
+        "listen": "127.0.0.1",
+        "sniffing": {
+          "domainsExcluded": [
+            "courier.push.apple.com"
+          ],
+          "destOverride": [
+            "tls",
+            "http",
+            "quic"
+          ],
+          "enabled": true
+        },
+        "settings": {
+          "udp": false,
+          "password": "123456",
+          "level": 8,
+          "ota": true,
+          "network": "tcp,udp",
+          "method": "chacha20-ietf-poly1305"
+        },
+        "tag": "socks",
+        "port": 64829,
+        "protocol": "shadowsocks"
+      },
+      {
+        "settings": {
+          "udp": true,
+          "userLevel": 8,
+          "auth": "noauth"
+        },
+        "listen": "127.0.0.1",
+        "tag": "directSocks",
+        "port": 1087,
+        "protocol": "socks"
+      },
+      {
+        "settings": {
+          "address": "[::1]"
+        },
+        "listen": "[::1]",
+        "tag": "api",
+        "port": 64830,
+        "protocol": "dokodemo-door"
+      },
+      {
+        "settings": {
+          "address": "8.8.8.8",
+          "timeout": 10,
+          "userLevel": 0,
+          "network": "tcp,udp",
+          "port": 53
+        },
+        "listen": "127.0.0.1",
+        "tag": "inDns",
+        "port": 64831,
+        "protocol": "dokodemo-door"
+      }
+    ],
+  "outbounds": [
+      {
+        "settings": {
+          "vnext": [
+            {
+              "address": "202.71.13.72",
+              "port": 443,
+              "users": [
+                {
+                  "id": "de62e9a1-002f-4565-945b-6b0d50db6fdc",
+                  "email": "",
+                  "level": 8,
+                  "flow": "",
+                  "encryption": "none"
+                }
+              ]
+            }
+          ]
+        },
+        "streamSettings": {
+          "realitySettings": {
+            "show": false,
+            "publicKey": "UQTpweZCQ-tD5_eoLnfV_d9I8JT5q8pkpVcThX-QSlw",
+            "shortId": "d1f243d558c7fca5",
+            "spiderX": "",
+            "fingerprint": "chrome",
+            "serverName": "cloudflare.com"
+          },
+          "security": "reality",
+          "tcpSettings": {
+            "header": {
+              "type": "none"
+            }
+          },
+          "network": "tcp"
+        },
+        "tag": "proxy",
+        "mux": {
+          "xudpConcurrency": 128,
+          "concurrency": 50,
+          "xudpProxyUDP443": "allow",
+          "enabled": false
+        },
+        "protocol": "vless"
+      },
+      {
+        "settings": {
+          "fragment": {
+            "length": "80-250",
+            "packets": "tlshello",
+            "interval": "10-100"
+          },
+          "userLevel": 8
+        },
+        "streamSettings": {
+          "sockopt": {
+            "tcpNoDelay": true
+          }
+        },
+        "tag": "fragment",
+        "protocol": "freedom"
+      }
+    ],
+  "api": {
+      "tag": "api",
+      "services": [
+        "StatsService"
+      ]
+    },
+  "dns": {
+      "tag": "dnsQuery",
+      "queryStrategy": "UseIP",
+      "disableFallbackIfMatch": true,
+      "servers": [
+        {
+          "skipFallback": false,
+          "address": "8.8.8.8"
+        }
+      ],
+      "disableFallback": true,
+      "disableCache": true
+    },
+  "stats": {},
+  "routing": {
+        "balancers": [],
+        "rules": [
+            {
+              "type": "field",
+              "outboundTag": "api",
+              "inboundTag": [
+                "api"
+              ]
+            },
+            {
+              "type": "field",
+              "outboundTag": "outDns",
+              "inboundTag": [
+                "inDns"
+              ]
+            },
+            {
+              "type": "field",
+              "outboundTag": "proxy",
+              "inboundTag": [
+                "dnsQuery"
+              ]
+            },
+            {
+              "type": "field",
+              "outboundTag": "direct",
+              "inboundTag": [
+                "directSocks"
+              ]
+            }
+          ],
+        "domainStrategy": "AsIs"
+      },
+  "policy": {
+        "levels": {
+          "8": {
+            "downlinkOnly": 1,
+            "bufferSize": 0,
+            "connIdle": 30,
+            "statsUserDownlink": false,
+            "uplinkOnly": 1,
+            "statsUserUplink": false,
+            "handshake": 4
+          }
+        },
+        "system": {
+          "statsOutboundUplink": true,
+          "statsOutboundDownlink": true,
+          "statsInboundUplink": true,
+          "statsInboundDownlink": true
+        }
+      },
+  "transport": {}
+}
